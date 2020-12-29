@@ -82,7 +82,7 @@ def current_sampling():
 # 登录MySQL，进行数据查询和取回本地
 def connect_and_operate_database():
     # 连接zabbix的数据库,charset参数是为了避免中文乱码，cursorclass是为了让后面fetchall返回的对象是dict字典
-    db = pymysql.connect(host="", user="root", password="Gdcatv@123", port=3306, database="zabbix1", charset='utf8',
+    db = pymysql.connect(host="", user="root", password="", port=3306, database="zabbix1", charset='utf8',
                          cursorclass=pymysql.cursors.DictCursor)
     # 创建游标
     cursor = db.cursor()
