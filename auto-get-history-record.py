@@ -116,12 +116,13 @@ def connect_and_operate_database():
 
 
 if __name__ == '__main__':
-    sampling_type = input('请输入数字选择采样模式，按回车结束，1.指定时间模式；2.使用当前时间模式：')
-    if sampling_type < str(2):
-        specified_sampling()
-    else:
-        current_sampling()
-    print('采样模式确认完毕')
+    # sampling_type = input('请输入数字选择采样模式，按回车结束，1.指定时间模式；2.使用当前时间模式：')
+    # if sampling_type < str(2):
+    # specified_sampling()
+    # else:
+    # current_sampling()
+    current_sampling()
+    print('执行当前时间采样模式')
     input_itemids = input('请输入需要监控的id，以英文逗号为间隔，按回车结束：').split(",")  # 将监控项传入转换为list
     for b in input_itemids: # 对列表进行遍历，每个itemid执行一次connect_and_operate_database模块
         itemid = b
