@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Written by Xunjueyulin
-# Version:0.1
+# Version:0.2
 
 import pymysql
 import calendar
@@ -13,6 +13,7 @@ start_sampling_time2 = time.time()
 end_sampling_time2 = time.time()
 itemid = 32148  # 初始化随机赋值，后期可写循环遍历监控id列表
 results = {}
+results_for_find_itemid = {}
 sampling_points = 0
 five_percent_sampling_points = 0
 ''' zabbix5.0将历史记录分开存放，需要先在items表中获取对应itemid的value_type；当值为0，表示监控记录存放于表history；当值为1，表示
@@ -112,6 +113,29 @@ def connect_and_operate_database():
     db.close()
 # 调用API取值，待开发
 
+
+# 模糊查询监控项的itemid
+def find_itemid():
+    # 连接zabbix的数据库,charset参数是为了避免中文乱码，cursorclass是为了让后面fetchall返回的对象是dict字典
+    db = pymysql.connect(host="", user="root", password="Gdcatv@123", port=3306, database="zabbix1", charset='utf8',
+                         cursorclass=pymysql.cursors.DictCursor)
+    # 创建游标
+    cursor = db.cursor()
+    keyword = input('请输入主机监控关键字用于模糊搜索，如"PanYu":')
+    keyword2 = '%' + keyword + '%'  # 由于mysql的模糊查询也需要用到%。这里先把需要查的字符串抽出来，再以参数方式传入
+    find_itemid_sql_statement = "SELECT itemid,name FROM items WHERE name LIKE '%s'" % keyword2
+    try:
+        cursor.execute(find_itemid_sql_statement)
+    # 获取查询结果
+        global results_for_find_itemid
+        results_for_find_itemid = cursor.fetchall()
+        for x in results_for_find_itemid:  # 遍历sql结果，打印输出
+            print(x)
+    except BaseException as error:
+        print("Error:unable to fetch data")
+    # 关闭数据库
+    db.close()
+
 # 以下执行流程
 
 
@@ -121,7 +145,12 @@ if __name__ == '__main__':
         specified_sampling()
     else:
         current_sampling()
-    print('采样模式确认完毕')
+    print('采样模式确认完毕,正在进入模糊搜索……')
+    find_itemid_type = input('请输入数字进行主机监控项模糊搜索，按回车结束，1.进入搜索；2.跳过搜索：')
+    if find_itemid_type < str(2):
+        find_itemid()
+    else:
+        print('跳过搜索，正在进入采样……')
     input_itemids = input('请输入需要监控的id，以英文逗号为间隔，按回车结束：').split(",")  # 将监控项传入转换为list
     for b in input_itemids: # 对列表进行遍历，每个itemid执行一次connect_and_operate_database模块
         itemid = b
